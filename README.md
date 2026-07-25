@@ -223,11 +223,40 @@ Sul piano **Hobby di Vercel il cron gira una volta al giorno**, e le espressioni
 più frequenti fanno fallire il deploy. GitHub Actions arriva a 5 minuti di
 intervallo ed esegue direttamente il Python già scritto.
 
-Due avvertenze previste in `.github/workflows/`:
-- i workflow schedulati vengono **disattivati dopo 60 giorni senza attività** sul
-  repository, e le esecuzioni automatiche non contano → `keepalive.yml` fa un
-  commit vuoto settimanale
-- sul piano gratuito le esecuzioni possono subire ritardi (irrilevante a 2/giorno)
+**Non ha funzionato, e per un motivo strutturale.** Vedi sotto.
+
+### Perché il motore gira in locale
+
+**Betfair Italia risponde `403 Forbidden` a qualsiasi connessione che non arrivi
+dall'Italia.** È un operatore con concessione ADM: deve servire solo il territorio
+nazionale, ed è la ragione per cui esiste l'endpoint separato
+`identitysso.betfair.it`.
+
+Verificato il 25/07/2026 — stesso codice, stesse credenziali, stesso momento:
+
+| Da dove | Esito |
+|---|---|
+| GitHub Actions (datacenter USA) | `403 Forbidden` |
+| PC dell'utente (IP italiano) | login regolare |
+
+Non è aggirabile con una configurazione, e non va aggirato: è un controllo di
+conformità, non un difetto. I workflow GitHub Actions sono stati **rimossi** invece
+di lasciarli fallire due volte al giorno.
+
+Il motore gira quindi dall'**Utilità di pianificazione di Windows**, con due attività
+giornaliere che eseguono `scripts/passata.cmd`:
+
+```
+schtasks /Create /TN "MonitorQuote-Mattina" /TR "C:\matchedbetting\scripts\passata.cmd" /SC DAILY /ST 11:00 /F
+schtasks /Create /TN "MonitorQuote-Sera"    /TR "C:\matchedbetting\scripts\passata.cmd" /SC DAILY /ST 18:00 /F
+```
+
+L'output finisce in `data/worker.log`. Per rimuoverle:
+`schtasks /Delete /TN "MonitorQuote-Mattina" /F`
+
+**Limite:** il PC deve essere acceso all'orario previsto. Per una copertura 24/7
+servirebbe una macchina in Italia — resta da verificare se Betfair accetti anche gli
+IP dei datacenter italiani o soltanto quelli residenziali.
 
 ### Il pannello (`pannello/`)
 

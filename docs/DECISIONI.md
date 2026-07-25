@@ -393,3 +393,50 @@ renderizzati lato server.
 
 Bookmaker delle occasioni trovate: Unibet (SE), 1xBet, Coolbet, Marathon Bet.
 Il problema di accesso resta quello già documentato.
+
+---
+
+## Aggiornamento 25/07/2026 (octies) — il motore non può girare nel cloud
+
+Prima esecuzione reale su GitHub Actions: **fallita**.
+
+```
+403 Client Error: Forbidden for url: https://identitysso.betfair.it/api/login
+```
+
+### Non è una credenziale, è la geografia
+Verificato nello stesso minuto, con lo stesso codice e le stesse credenziali:
+
+| Da dove | Esito |
+|---|---|
+| GitHub Actions (runner in datacenter USA) | `403 Forbidden` |
+| PC dell'utente (IP residenziale italiano) | login OK, token ricevuto |
+
+**Betfair Italia serve solo l'Italia.** È un operatore con concessione ADM ed è
+tenuto a farlo: è esattamente la ragione per cui esiste l'endpoint separato `.it`
+invece del `.com`. Non è un difetto da aggirare, è un controllo di conformità.
+
+### Decisione: motore in locale, workflow rimossi
+I due workflow GitHub Actions sono stati **cancellati** invece di essere lasciati a
+fallire due volte al giorno. Un impianto che per costruzione non può funzionare è
+peggio che nessun impianto: genera rumore e nasconde i guasti veri.
+
+Il motore gira dall'**Utilità di pianificazione di Windows**, due attività giornaliere
+(`MonitorQuote-Mattina` 11:00, `MonitorQuote-Sera` 18:00) che eseguono
+`scripts/passata.cmd` e scrivono in `data/worker.log`.
+
+Prima esecuzione dall'Utilità di pianificazione: riuscita in 10,9 s, 6 crediti spesi,
+mail inviata con 2 occasioni nuove.
+
+### Cosa cambia e cosa no
+- ✅ Supabase, pannello Vercel, mail Resend: **inalterati**. Sono raggiungibili da
+  ovunque, e il pannello legge dal database senza sapere chi lo abbia scritto.
+- ⚠️ **Il PC deve essere acceso** agli orari previsti. È il nuovo limite del sistema.
+- ❓ Per una copertura 24/7 servirebbe una macchina in Italia. **Da verificare prima
+  di spendere**: Betfair potrebbe bloccare anche gli IP di datacenter italiani e non
+  solo quelli esteri. Si prova con una VPS a consumo prima di impegnarsi.
+
+> Nota di metodo: questo è il secondo vincolo di conformità ADM che ridisegna il
+> progetto, dopo l'inibizione di Polymarket. Vale la pena assumere, per il futuro,
+> che ogni servizio regolamentato italiano abbia una barriera analoga, e verificarlo
+> **prima** di costruirci sopra.
