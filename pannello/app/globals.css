@@ -1,0 +1,388 @@
+/* ---------------------------------------------------------------------------
+   Token unici: i componenti leggono SOLO da qui, mai colori diretti.
+   Cosi' il tema scuro si ottiene ridefinendo i token, non duplicando le regole.
+   --------------------------------------------------------------------------- */
+:root {
+    --fondo:        #f6f7f9;   /* grigio-carta a virata fredda, non bianco puro */
+    --superficie:   #ffffff;
+    --superficie-2: #eef0f4;
+    --bordo:        #dde1e8;
+    --bordo-forte:  #c3cad5;
+
+    --testo:        #11151b;
+    --testo-medio:  #4a5563;
+    --testo-debole: #78828f;
+
+    --ottone:       #966d22;   /* accento di cromatura, NON semantico */
+    --ottone-tenue: #f0e6d2;
+
+    --verde:        #1b7f4e;   /* profitto */
+    --verde-tenue:  #e3f2e9;
+    --ambra:        #b26a00;   /* liquidita' limitata */
+    --ambra-tenue:  #fbeedd;
+    --rosso:        #b3261e;   /* motore fermo */
+    --rosso-tenue:  #fbe6e4;
+
+    --ombra: 0 1px 2px rgba(17, 21, 27, .05), 0 4px 14px rgba(17, 21, 27, .04);
+
+    /* next/font genera nomi con hash: si passa sempre dalle sue variabili */
+    --display: var(--font-display), system-ui, sans-serif;
+    --corpo:   var(--font-corpo), system-ui, sans-serif;
+    --dati:    var(--font-dati), ui-monospace, monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --fondo:        #11151b;
+        --superficie:   #181d25;
+        --superficie-2: #212833;
+        --bordo:        #2a323e;
+        --bordo-forte:  #3d4757;
+
+        --testo:        #e6eaf0;
+        --testo-medio:  #a3adba;
+        --testo-debole: #7b8593;
+
+        --ottone:       #c9a24e;
+        --ottone-tenue: #33291a;
+
+        --verde:        #4ec98a;
+        --verde-tenue:  #16301f;
+        --ambra:        #e0a052;
+        --ambra-tenue:  #33260f;
+        --rosso:        #f0837a;
+        --rosso-tenue:  #331917;
+
+        --ombra: 0 1px 2px rgba(0, 0, 0, .3), 0 4px 14px rgba(0, 0, 0, .25);
+    }
+}
+
+/* Il selettore del tema esplicito deve vincere in entrambe le direzioni */
+:root[data-theme="light"] {
+    --fondo: #f6f7f9;   --superficie: #ffffff;  --superficie-2: #eef0f4;
+    --bordo: #dde1e8;   --bordo-forte: #c3cad5;
+    --testo: #11151b;   --testo-medio: #4a5563; --testo-debole: #78828f;
+    --ottone: #966d22;  --ottone-tenue: #f0e6d2;
+    --verde: #1b7f4e;   --verde-tenue: #e3f2e9;
+    --ambra: #b26a00;   --ambra-tenue: #fbeedd;
+    --rosso: #b3261e;   --rosso-tenue: #fbe6e4;
+}
+
+:root[data-theme="dark"] {
+    --fondo: #11151b;   --superficie: #181d25;  --superficie-2: #212833;
+    --bordo: #2a323e;   --bordo-forte: #3d4757;
+    --testo: #e6eaf0;   --testo-medio: #a3adba; --testo-debole: #7b8593;
+    --ottone: #c9a24e;  --ottone-tenue: #33291a;
+    --verde: #4ec98a;   --verde-tenue: #16301f;
+    --ambra: #e0a052;   --ambra-tenue: #33260f;
+    --rosso: #f0837a;   --rosso-tenue: #331917;
+}
+
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    background: var(--fondo);
+    color: var(--testo);
+    font-family: var(--corpo);
+    font-size: 15px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+}
+
+.guscio {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 32px 20px 72px;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+}
+
+/* --- intestazione ------------------------------------------------------- */
+
+.testata { display: flex; flex-direction: column; gap: 4px; }
+
+.marchio {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: clamp(26px, 4vw, 34px);
+    letter-spacing: -.02em;
+    text-wrap: balance;
+    margin: 0;
+}
+
+.marchio em {
+    font-style: normal;
+    color: var(--ottone);
+}
+
+.sottotitolo { color: var(--testo-medio); margin: 0; max-width: 62ch; }
+
+/* --- riga di stato ------------------------------------------------------ */
+
+.stato {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 1px;
+    background: var(--bordo);
+    border: 1px solid var(--bordo);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.tassello {
+    background: var(--superficie);
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.etichetta {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--testo-debole);
+}
+
+.valore {
+    font-family: var(--dati);
+    font-variant-numeric: tabular-nums;
+    font-size: 21px;
+    font-weight: 500;
+    letter-spacing: -.01em;
+}
+
+.nota { font-size: 12px; color: var(--testo-debole); }
+
+.pillola {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    align-self: flex-start;
+    padding: 2px 9px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.pillola::before {
+    content: "";
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+.pillola.ok    { color: var(--verde); background: var(--verde-tenue); }
+.pillola.avviso{ color: var(--ambra); background: var(--ambra-tenue); }
+.pillola.fermo { color: var(--rosso); background: var(--rosso-tenue); }
+
+/* barra dei crediti: la quota e' il vincolo vero, va vista subito */
+.barra {
+    height: 5px;
+    border-radius: 3px;
+    background: var(--superficie-2);
+    overflow: hidden;
+}
+
+.barra > span {
+    display: block;
+    height: 100%;
+    background: var(--ottone);
+}
+
+/* --- sezioni ------------------------------------------------------------ */
+
+.sezione { display: flex; flex-direction: column; gap: 14px; }
+
+.titolo-sezione {
+    font-family: var(--display);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--testo-debole);
+    margin: 0;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--bordo);
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+}
+
+/* --- schedina ----------------------------------------------------------- */
+
+.schedina {
+    background: var(--superficie);
+    border: 1px solid var(--bordo);
+    border-radius: 10px;
+    box-shadow: var(--ombra);
+    overflow: hidden;
+}
+
+.schedina-testa {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--bordo);
+}
+
+.evento {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 17px;
+    letter-spacing: -.01em;
+    margin: 0;
+}
+
+.contesto { font-size: 12.5px; color: var(--testo-debole); }
+
+.margine {
+    font-family: var(--dati);
+    font-variant-numeric: tabular-nums;
+    font-size: 26px;
+    font-weight: 600;
+    color: var(--verde);
+    line-height: 1.1;
+    text-align: right;
+    white-space: nowrap;
+}
+
+.margine small {
+    display: block;
+    font-family: var(--corpo);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--testo-debole);
+}
+
+/* le due gambe, separate da una perforazione come su una schedina vera */
+.gambe { display: grid; grid-template-columns: 1fr 1fr; }
+
+.gamba {
+    padding: 15px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.gamba + .gamba {
+    border-left: 1px dashed var(--bordo-forte);
+}
+
+.passo {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--ottone);
+}
+
+.importo {
+    font-family: var(--dati);
+    font-variant-numeric: tabular-nums;
+    font-size: 19px;
+    font-weight: 500;
+}
+
+.dove { font-size: 13px; color: var(--testo-medio); }
+.dove b { color: var(--testo); font-weight: 600; }
+
+.schedina-piede {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 18px;
+    padding: 11px 18px;
+    border-top: 1px solid var(--bordo);
+    background: var(--superficie-2);
+    font-size: 12.5px;
+    color: var(--testo-medio);
+}
+
+.schedina-piede span { display: inline-flex; gap: 6px; }
+.schedina-piede b {
+    font-family: var(--dati);
+    font-variant-numeric: tabular-nums;
+    color: var(--testo);
+    font-weight: 500;
+}
+
+.avviso-liquidita { color: var(--ambra); font-weight: 600; }
+
+/* --- tabella storico ---------------------------------------------------- */
+
+.tabella-guscio { overflow-x: auto; }
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+    min-width: 560px;
+}
+
+th {
+    text-align: left;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+    color: var(--testo-debole);
+    padding: 0 12px 8px 0;
+    border-bottom: 1px solid var(--bordo);
+}
+
+td {
+    padding: 9px 12px 9px 0;
+    border-bottom: 1px solid var(--bordo);
+    font-variant-numeric: tabular-nums;
+}
+
+td.num { font-family: var(--dati); }
+th.destra, td.destra { text-align: right; padding-right: 0; }
+
+/* --- vuoto -------------------------------------------------------------- */
+
+.vuoto {
+    background: var(--superficie);
+    border: 1px dashed var(--bordo-forte);
+    border-radius: 10px;
+    padding: 40px 24px;
+    text-align: center;
+    color: var(--testo-medio);
+}
+
+.vuoto strong { display: block; color: var(--testo); margin-bottom: 6px; }
+
+.pie {
+    font-size: 12.5px;
+    color: var(--testo-debole);
+    border-top: 1px solid var(--bordo);
+    padding-top: 16px;
+    line-height: 1.6;
+}
+
+a { color: var(--ottone); }
+
+:focus-visible {
+    outline: 2px solid var(--ottone);
+    outline-offset: 2px;
+    border-radius: 3px;
+}
+
+@media (max-width: 620px) {
+    .gambe { grid-template-columns: 1fr; }
+    .gamba + .gamba {
+        border-left: none;
+        border-top: 1px dashed var(--bordo-forte);
+    }
+    .schedina-testa { flex-direction: column; }
+    .margine { text-align: left; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+}

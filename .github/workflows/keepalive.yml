@@ -1,0 +1,27 @@
+name: Keepalive
+
+# GitHub disattiva i workflow schedulati dopo 60 giorni senza attivita' sul
+# repository — e le esecuzioni automatiche NON contano come attivita'. Il
+# monitor smetterebbe di girare in silenzio, con una sola mail di avviso.
+#
+# Questo job fa un commit vuoto una volta a settimana: costa nulla e tiene il
+# contatore a zero.
+on:
+  schedule:
+    - cron: "0 5 * * 1"   # ogni lunedi' alle 05:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit --allow-empty -m "keepalive: mantiene attivi i workflow schedulati"
+          git push

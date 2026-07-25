@@ -1,0 +1,59 @@
+name: Monitor quote
+
+# Il piano gratuito di The Odds API da' 500 crediti al mese. Una passata ne
+# consuma quanti sono i campionati interrogati (--crediti ne fissa il tetto).
+# Con 6 crediti x 2 passate al giorno x 30 giorni = 360 crediti: sta dentro,
+# con margine per le esecuzioni manuali.
+#
+# Gli orari sono scelti prima dei calci d'inizio europei e americani, che e'
+# quando i disallineamenti compaiono.
+on:
+  schedule:
+    - cron: "0 9 * * *"    # 09:00 UTC — prima delle partite europee
+    - cron: "0 16 * * *"   # 16:00 UTC — prima di serali europee e MLS
+  workflow_dispatch:        # esecuzione manuale dal tab Actions
+    inputs:
+      crediti:
+        description: "Crediti massimi da spendere"
+        required: false
+        default: "6"
+      min_profit:
+        description: "Margine minimo per segnalare (%)"
+        required: false
+        default: "0.5"
+
+concurrency:
+  group: monitor
+  cancel-in-progress: false
+
+jobs:
+  scansione:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      - name: Passata del monitor
+        env:
+          ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
+          ODDS_REGIONS: eu
+          BETFAIR_APP_KEY: ${{ secrets.BETFAIR_APP_KEY }}
+          BETFAIR_USERNAME: ${{ secrets.BETFAIR_USERNAME }}
+          BETFAIR_PASSWORD: ${{ secrets.BETFAIR_PASSWORD }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          EMAIL_A: ${{ secrets.EMAIL_A }}
+          EMAIL_DA: ${{ secrets.EMAIL_DA }}
+        run: |
+          python src/worker.py \
+            --crediti ${{ github.event.inputs.crediti || '6' }} \
+            --min-profit ${{ github.event.inputs.min_profit || '0.5' }}

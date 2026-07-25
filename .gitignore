@@ -1,0 +1,18 @@
+.env
+.env.local
+__pycache__/
+*.pyc
+*.csv
+*.log
+*.jsonl
+data/
+.venv/
+venv/
+node_modules/
+.next/
+.vercel
+
+# file personali finiti nella cartella per errore
+supabase passowrd.txt
+*password*.txt
+*.key
