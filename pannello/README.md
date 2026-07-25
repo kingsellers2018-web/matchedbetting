@@ -31,9 +31,24 @@ Crea un `.env.local` con le stesse due variabili.
 ## Deploy su Vercel
 
 1. Importa il repository
-2. **Root Directory** → `pannello` (importante: il repo contiene anche il Python)
-3. Aggiungi le due variabili d'ambiente
-4. Deploy
+2. **Root Directory** → `pannello`
+3. **Framework Preset** → `Next.js`
+4. Aggiungi le due variabili d'ambiente
+5. Deploy
+
+### Se il build fallisce con «No python entrypoint found»
+
+Sono i passi 2 e 3 non applicati. Vercel scansiona la radice del repository,
+trova `requirements.txt`, conclude «progetto Python» e cerca `app.py` o
+`main.py` — che qui non esistono e non devono esistere: il motore Python gira
+su GitHub Actions, non su Vercel.
+
+Si corregge in *Settings → Build and Deployment*, mettendo `pannello` in
+**Root Directory** e `Next.js` in **Framework Preset**. Poi *Deployments →
+Redeploy* **senza** la spunta *Use existing Build Cache*.
+
+Da qui il `vercel.json` in questa cartella: dichiara il framework in modo
+esplicito, così l'autodetezione non ha margine di errore.
 
 La pagina si rigenera ogni 60 secondi. Il worker scrive due volte al giorno,
 quindi non serve nulla di più reattivo.
